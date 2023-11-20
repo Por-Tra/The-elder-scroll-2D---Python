@@ -4,13 +4,13 @@ import pygame
 
 
 global choix_personnage
-choix_personnage = "Archer.png"
 
-class Player(pygame.sprite.Sprite):
 
-    def __init__(self,x,y) -> None:
+class Entity(pygame.sprite.Sprite):
+
+    def __init__(self,name,x,y) -> None:
         super().__init__()
-        self.sprite_sheet = pygame.image.load('./assets/character/' + choix_personnage)
+        self.sprite_sheet = pygame.image.load(f'./assets/character/{name}.png')
         self.image = self.get_image(0,0)
         self.image.set_colorkey([0,0,0])  #retire le contour noir du spreet
         self.rect = self.image.get_rect()
@@ -74,3 +74,15 @@ class Player(pygame.sprite.Sprite):
         image.blit(self.sprite_sheet, (0,0),(x, y, 64, 64) )
         return image
 
+
+class Player(Entity):
+
+    def __init__(self):
+        super().__init__('Archer',0,0)
+
+class NPC(Entity):
+
+    #il faut faire un chemin sur tiled pour que le pnj le suive
+
+    def __init__(self,name):
+        super().__init__(name,0,0)

@@ -1,9 +1,5 @@
 import pygame
-
 #from pygame.sprite import _Group
-
-
-global choix_personnage
 
 
 class Entity(pygame.sprite.Sprite):
@@ -22,6 +18,7 @@ class Entity(pygame.sprite.Sprite):
             'right':self.get_image(0,704),
             'left':self.get_image(0,576)
         }
+
         self.feet = pygame.Rect(0,0, self.rect.width * 0.5, 16)
         self.old_position = self.position.copy()
         self.speed = 2
@@ -33,19 +30,31 @@ class Entity(pygame.sprite.Sprite):
 
     def save_location(self): self.old_position = self.position.copy()
 
+    #changement des animations
 
-    #méthode de déplacement
-    def move_player(self, type):
-        self.image = self.animation[type]
-        self.image.set_colorkey([0, 0, 0])
-        if type == "up":
-            self.position[1] -= self.speed
-        elif type == "down":
-            self.position[1] += self.speed
-        elif type == "right":
-            self.position[0] += self.speed
-        elif type == "left":
-            self.position[0] -= self.speed
+    def change_animation(self,name):
+        """
+        change l'animation de l'entité en fonction de son deplacement
+        :param name:
+        :return:
+        """
+        self.image = self.animation[name]    #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!bug ici
+        self.image.set_colorkey(0,0)
+
+    #mouvement des entités
+
+    def move_up(self,):
+        self.change_animation('up')
+        self.position[1] -= self.speed
+    def move_down(self):
+        self.change_animation('down')
+        self.position[1] += self.speed
+    def move_right(self):
+        self.change_animation('right')
+        self.position[0] += self.speed
+    def move_left(self):
+        self.change_animation('left')
+        self.position[0] -= self.speed
 
     def update(self):
         """
@@ -84,5 +93,67 @@ class NPC(Entity):
 
     #il faut faire un chemin sur tiled pour que le pnj le suive
 
-    def __init__(self,name):
+    def __init__(self,name, qt_points):
         super().__init__(name,0,0)
+
+
+        self.speed = 1
+        self.nb_points = qt_points
+        self.points = []
+        self.nom = name
+        self.current_point = 0   #=premier points de la liste de points
+
+
+    def move(self):
+        """
+        permet au npc d'aller d'un point A à un point B
+        :return:
+        """
+        current_point = self.current_point      #point A
+        target_point = self.current_point + 1   #point B
+
+        #verifie si le tour a été fait par le npc
+
+        if target_point >= self.nb_points:
+            target_point = 0
+
+        current_rect = self.points[current_point]   #aller point A
+        target_rect = self.points[target_point]     #aller point B
+
+        if current_rect.y < target_rect.y and abs(current_rect.x - target_rect.x) < 1:
+            self.move_down()
+        elif current_rect.y > target_rect.y and abs(current_rect.x - target_rect.x) < 1:
+            self.move_up()
+        elif current_rect.x < target_rect.x and abs(current_rect.y - target_rect.y) < 1:
+            self.move_right()
+        elif current_rect.x > target_rect.x and abs(current_rect.y - target_rect.y) < 1:
+            self.move_left()
+
+
+        #on change de nouveau points
+        if self.rect.colliderect(target_rect):
+            self.current_point = target_point
+
+    def teleport_point(self):
+        """
+        définit le point de spawn du NPC
+        :return:
+        """
+
+        localisation = self.points[self.current_point]
+        self.position[0] = localisation.x
+        self.position[1] = localisation.y
+        self.save_location()   #validé la téléportation
+
+    def load_point(self,map):
+        """
+        récupere les points de passage du pnj
+        :return:
+        """
+
+        for num in range(1,self.nb_points+1):
+            point = map.get_object(f"{self.nom}_path{num}")
+            rect = pygame.Rect(point.x, point.y,point.width,point.height)
+            self.points.append(rect)
+
+

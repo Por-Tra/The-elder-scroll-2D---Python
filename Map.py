@@ -3,6 +3,8 @@ import pygame
 import pytmx
 import pyscroll
 
+from player import *
+
 
 
 @dataclass
@@ -23,7 +25,7 @@ class Map:
     group: pyscroll.PyscrollGroup
     tmx_data: pytmx.TiledMap
     portals: list[Portal]
-    #npc: list[NPC]
+    npc: list[NPC]
 
 class MapManager:
 
@@ -33,22 +35,31 @@ class MapManager:
         self.player = joueur
         self.current_map = 'map'        #carte de début
 
+
+    #chargement des maps et NPC
+        #pour aller dans la grotte
         self.register_map("map" , portals=[
-            Portal(from_world='world' , origin_point='enter_cave',target_world='cave',teleport_point='spawn_cave')
+            Portal(from_world='map' , origin_point='enter_cave',target_world='cave',teleport_point='spawn_cave')
+        ],npcs=[
+            NPC("pnj_1",qt_points=4 )
         ])
+
+        #pour aller sur la première map
         self.register_map("cave", portals=[
-            Portal(from_world='cave',origin_point='exit_cave',target_world='world',teleport_point='exit_cave_spawn')
+            Portal(from_world='cave',origin_point='exit_cave',target_world='map',teleport_point='exit_cave_spawn')
         ])
 
         self.teleport_player('spawn')
+        self.teleport_NPC()
 
     def check_collisions(self):
+        
 
         #portail
         for portal in self.get_map().portals:
             if portal.from_world == self.current_map:
                 point = self.get_object(portal.origin_point)
-                rect = pygame.Rect(point.x,point.y,point.widht,point.height)
+                rect = pygame.Rect(point.x,point.y,point.width,point.height)
 
                 if self.player.feet.colliderect(rect):
                     copy_portal = portal
@@ -72,7 +83,7 @@ class MapManager:
         self.player.save_location()      #pour éviter les bug de téléportation avec les collisions
 
 
-    def register_map(self,name,portals=[]):
+    def register_map(self,name,portals=[], npcs=[]):
         """
         enregistrer les maps
         :param name:
@@ -94,8 +105,12 @@ class MapManager:
         group = pyscroll.PyscrollGroup(map_layer=map_layer, default_layer=6)
         group.add(self.player)
 
+        #récupérer les npcs et les ajouters au groupe
+        for npc in npcs:
+            group.add(npc)
+
         #cree objet map
-        self.maps[name] = Map(name,walls,group,tmx_data, portals)
+        self.maps[name] = Map(name,walls,group,tmx_data, portals, npcs)
 
     #récupérer la map
     def get_map(self):return self.maps[self.current_map]
@@ -109,6 +124,21 @@ class MapManager:
     #récuperer les coordonné du spawn du joueur
     def get_object(self,name): return self.get_map().tmx_data.get_object_by_name(name)
 
+    def teleport_NPC(self):
+        """
+        teleporte le NPC dans son spawn
+        :return:
+        """
+
+        for map in self.maps:
+            map_data = self.maps[map]
+            npcs = map_data.npc
+
+            for npc in npcs:
+                npc.load_point(self)
+                npc.teleport_point()
+
+
     def draw(self):
         """
         déssiner la carte
@@ -120,3 +150,6 @@ class MapManager:
     def update(self):
         self.get_group().update()
         self.check_collisions()
+
+        for npc in self.get_map().npc:
+            npc.move()

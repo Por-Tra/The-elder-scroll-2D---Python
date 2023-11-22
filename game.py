@@ -31,20 +31,17 @@ class Game:
 
         pressed = pygame.key.get_pressed()
 
-        if pressed[pygame.K_ESCAPE]:
-            self.running = False
+        """if pressed[pygame.K_ESCAPE]:
+            self.running = False"""
 
         if pressed[pygame.K_UP]:
-            self.player.move_player("up")
-
+            self.player.move_up()
         elif pressed[pygame.K_DOWN]:
-            self.player.move_player("down")
-
+            self.player.move_down()
         elif pressed[pygame.K_LEFT]:
-            self.player.move_player("left")
-
+            self.player.move_left()
         elif pressed[pygame.K_RIGHT]:
-            self.player.move_player("right")
+            self.player.move_right()
 
 
     def update(self):
@@ -76,3 +73,4 @@ class Game:
             clock.tick(60)  #les fps
 
         pygame.quit()
+

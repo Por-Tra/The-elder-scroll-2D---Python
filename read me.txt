@@ -1,0 +1,15 @@
+﻿projet de NSI réalisé par Lucas Contreras Hodapp et Clément Faillet Turon
+
+pour l'utiliser:
+installer les modules pygame, dataclasses, pytmx et pyscroll
+
+touches:
+z avancer
+s reculer
+q aller à gauche
+d aller à droite
+r courir
+w marcher
+espace intéragir avec les NPC
+
+les flèches pour attaquer un ennemi

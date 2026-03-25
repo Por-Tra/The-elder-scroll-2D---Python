@@ -70,7 +70,7 @@ class AnimateSprite(pygame.sprite.Sprite):
 
         self.image = self.animation[name][self.animation_index]
 
-        self.image.set_colorkey(0, 0)
+        self.image.set_colorkey((0, 0, 0))
         self.clock += self.speed * 8    #limiteur de vitesse d'animation
 
         if self.clock >= 100:

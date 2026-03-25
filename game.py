@@ -36,27 +36,31 @@ class Game:
         :return:
         """
 
+        if self.player.heart < 1:
+            return
+
         pressed = pygame.key.get_pressed()
+
+        self.player.speed = 3 if pressed[pygame.K_r] else 2
 
         if pressed[pygame.K_z]:
             self.player.move_up()
-        elif pressed[pygame.K_s]:
+        if pressed[pygame.K_s]:
             self.player.move_down()
-        elif pressed[pygame.K_q]:
+        if pressed[pygame.K_q]:
             self.player.move_left()
-        elif pressed[pygame.K_d]:
+        if pressed[pygame.K_d]:
             self.player.move_right()
-        elif pressed[pygame.K_r]:     #courrir
-            self.player.speed = 3
-        elif pressed[pygame.K_w]:     #marcher
+        if pressed[pygame.K_w]:     #marcher
             self.player.speed = 2
-        elif pressed[pygame.K_UP]:
+
+        if pressed[pygame.K_UP]:
             self.player.attaque_up()
-        elif pressed[pygame.K_DOWN]:
+        if pressed[pygame.K_DOWN]:
             self.player.attaque_down()
-        elif pressed[pygame.K_RIGHT]:
+        if pressed[pygame.K_RIGHT]:
             self.player.attaque_right()
-        elif pressed[pygame.K_LEFT]:
+        if pressed[pygame.K_LEFT]:
             self.player.attaque_left()
 
     def update(self):

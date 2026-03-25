@@ -4,6 +4,7 @@
 
 from dataclasses import dataclass
 
+import pygame
 import pygame.font
 import pytmx
 import pyscroll
@@ -216,12 +217,19 @@ class MapManager:
                 mob.load_mob_spawn(map_data.tmx_data)
                 mob.mob_spawn()
 
-    def register_map(self, name, portals=[], npcs=[], monster=[]):
+    def register_map(self, name, portals=None, npcs=None, monster=None):
         """
         enregistrer les maps et tout ce qu'il y a dedans
         :param name:
         :return:
         """
+        if portals is None:
+            portals = []
+        if npcs is None:
+            npcs = []
+        if monster is None:
+            monster = []
+
         tmx_data = pytmx.util_pygame.load_pygame(f"./assets/map/{name}.tmx")
         map_data = pyscroll.data.TiledMapData(tmx_data)
         map_layer = pyscroll.orthographic.BufferedRenderer(map_data, self.screen.get_size())
@@ -282,6 +290,61 @@ class MapManager:
         """
         self.get_group().draw(self.screen)  #dessiner le calque
         self.get_group().center(self.player.rect.center)  #centrer la caméra
+        self.draw_player_health_bar()
+        self.draw_monsters_health_bars()
+
+    def world_to_screen(self, world_x, world_y):
+        """
+        Convertit une position monde (x, y) en position écran selon la caméra centrée sur le joueur.
+        """
+        screen_width, screen_height = self.screen.get_size()
+        screen_x = world_x - self.player.rect.centerx + (screen_width // 2)
+        screen_y = world_y - self.player.rect.centery + (screen_height // 2)
+        return screen_x, screen_y
+
+    def draw_health_bar(self, x, y, width, height, current_health, max_health):
+        """
+        Dessine une barre de vie simple avec fond, contour et remplissage.
+        """
+        if max_health <= 0:
+            return
+
+        clamped_health = max(0, min(current_health, max_health))
+        ratio = clamped_health / max_health
+
+        bg_rect = pygame.Rect(x, y, width, height)
+        fill_rect = pygame.Rect(x, y, int(width * ratio), height)
+
+        pygame.draw.rect(self.screen, (60, 60, 60), bg_rect)
+        pygame.draw.rect(self.screen, (220, 40, 40), fill_rect)
+        pygame.draw.rect(self.screen, (255, 255, 255), bg_rect, 2)
+
+    def draw_player_health_bar(self):
+        """
+        Barre de vie du joueur affichée en HUD (fixe à l'écran).
+        """
+        self.draw_health_bar(20, 20, 250, 22, self.player.heart, self.player.max_heart)
+
+    def draw_monsters_health_bars(self):
+        """
+        Barres de vie des monstres affichées juste au-dessus du sprite,
+        avec un calcul basé sur les pieds (mob.feet).
+        """
+        for mob in self.get_map().monster:
+            if mob.heart <= 0:
+                continue
+
+            feet_world_x = mob.feet.centerx
+            feet_world_y = mob.feet.midbottom[1]
+            sprite_top_world_y = feet_world_y - mob.rect.height
+
+            screen_x, sprite_top_screen_y = self.world_to_screen(feet_world_x, sprite_top_world_y)
+            bar_width = max(30, mob.rect.width)
+            bar_height = 8
+            bar_x = screen_x - (bar_width // 2)
+            bar_y = sprite_top_screen_y - 10
+
+            self.draw_health_bar(bar_x, bar_y, bar_width, bar_height, mob.heart, mob.max_heart)
 
     def update(self):
         """

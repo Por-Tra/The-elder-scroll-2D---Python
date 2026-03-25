@@ -10,6 +10,9 @@ Jeu 2D en Python réalisé dans le cadre de la NSI, avec sélection de personnag
 ![PyScroll](https://img.shields.io/badge/PyScroll-Map%20Rendering-6A5ACD)
 ![Tiled](https://img.shields.io/badge/Tiled-Map%20Editor-4CAF50)
 
+## Date de réalisation:
+Novembre 2024
+
 ## Aperçu
 
 Le jeu démarre sur un menu qui permet de choisir entre **Chevalier**, **Mage** et **Archer**. Ensuite, vous explorez plusieurs cartes (`map`, `catacombes_map`, `Dungeon_map`) avec combats et interactions avec des PNJ.

@@ -79,7 +79,8 @@ class Player(Entity):
         super().__init__(personnage_choisi, 0, 0)
 
         self.personnage = personnage_choisi
-        self.heart = 600
+        self.max_heart = 600
+        self.heart = self.max_heart
         self.hit = 0.4  #dégat du joueur s'adapte au boucle + par défaut pour le mage
 
         if self.personnage == 'Archer':
@@ -93,15 +94,13 @@ class Player(Entity):
         :return: True
         sinon None
         """
-
-        if pygame.key.get_pressed()[pygame.K_UP]:
-            return True
-        elif pygame.key.get_pressed()[pygame.K_DOWN]:
-            return True
-        elif pygame.key.get_pressed()[pygame.K_RIGHT]:
-            return True
-        elif pygame.key.get_pressed()[pygame.K_LEFT]:
-            return True
+        pressed = pygame.key.get_pressed()
+        return any([
+            pressed[pygame.K_UP],
+            pressed[pygame.K_DOWN],
+            pressed[pygame.K_RIGHT],
+            pressed[pygame.K_LEFT]
+        ])
 
     def verif_si_mort(self):
         """
@@ -138,7 +137,8 @@ class Monster(Entity):
         self.name_point = spawn
         self.spawn_point = []
         self.current_point = 0
-        self.heart = vie
+        self.max_heart = vie
+        self.heart = self.max_heart
 
         self.follow = True
 
@@ -238,9 +238,9 @@ class NPC(Entity):
     constructeur de NPC
     """
 
-    def __init__(self, name, qt_points, dialogo=[]):
+    def __init__(self, name, qt_points, dialogo=None):
         super().__init__(name, 0, 0)
-        self.dialog = dialogo
+        self.dialog = dialogo if dialogo is not None else []
         self.speed = 1
         self.nb_points = qt_points
         self.points = []

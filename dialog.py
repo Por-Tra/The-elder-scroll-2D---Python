@@ -15,13 +15,16 @@ class DialogBox:
         self.font = pygame.font.Font("./dialogues/dialog_font.ttf", 15) # police des caractères
         self.reading = False
 
-    def execute(self, dialogo=[]):
+    def execute(self, dialogo=None):
         """
         Vérifie si on est en train de lire, si oui on passe au prochain texte si il existe
         Sinon on lance la boite de dialogue
         :param dialogo:
         :return:
         """
+        if dialogo is None:
+            dialogo = []
+
         if self.reading:
             self.next_text()
         else:
@@ -35,14 +38,15 @@ class DialogBox:
         :param screen:
         :return:
         """
-        if self.reading:
+        if self.reading and self.texts:
             self.letter_index += 1
 
-            if self.letter_index >= len(self.texts[self.text_index]):
-                self.letter_index = self.letter_index
+            current_text = self.texts[self.text_index]
+            if self.letter_index > len(current_text):
+                self.letter_index = len(current_text)
 
             screen.blit(self.box, (self.X_POSITION, self.Y_POSITION)) # Position de la boite de dialogue sur l'écran
-            text = self.font.render(self.texts[self.text_index][0:self.letter_index], False, (200, 20, 20)) #couleur du texte, là c'est rouge
+            text = self.font.render(current_text[0:self.letter_index], False, (200, 20, 20)) #couleur du texte, là c'est rouge
             screen.blit(text, (self.X_POSITION + 40, self.Y_POSITION + 60)) # position du texte sur l'ecran
 
     def next_text(self):

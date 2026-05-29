@@ -77,3 +77,8 @@ python main.py
 
 - Lucas Contreras Hodapp
 - Clément Faillet Turon
+
+- Sprites par le projet Liberated Pixel Cup (LPC)
+https://opengameart.org/content/lpc-collection
+
+Crédits détaillés : https://github.com/LiberatedPixelCup/Universal-LPC-Spritesheet-Character-Generator/blob/master/CREDITS.csv
